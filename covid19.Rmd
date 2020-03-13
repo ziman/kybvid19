@@ -22,11 +22,11 @@ load <- function(fname) {
 
 ```{r}
 xs <- bind_rows(
-  load('/home/ziman/dev/COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv') %>%
+  load('data/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv') %>%
     mutate(type='confirmed'),
-  load('/home/ziman/dev/COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv') %>%
+  load('data/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv') %>%
     mutate(type='deaths'),
-  load('/home/ziman/dev/COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv') %>%
+  load('data/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv') %>%
     mutate(type='recovered')
 )
 countries <- read_csv('/home/ziman/dev/COVID-19/nations1.csv') %>%
