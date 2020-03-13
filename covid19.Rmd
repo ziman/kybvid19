@@ -1,0 +1,136 @@
+---
+title: "covid19"
+author: "ziman"
+date: "11 March 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(ggrepel)
+knitr::opts_chunk$set(echo = FALSE)
+
+load <- function(fname) {
+  xs_raw <- read_csv(fname)
+  colnames(xs_raw)[1:4] <- c('province', 'country', 'lat', 'lon')
+  xs <- xs_raw %>%
+    pivot_longer(c(-province, -country, -lat, -lon), names_to='date') %>%
+    mutate(date=as.POSIXct(strptime(date, '%m/%d/%y'))) %>%
+    rename(cases=value)
+}
+```
+
+```{r}
+xs <- bind_rows(
+  load('/home/ziman/dev/COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv') %>%
+    mutate(type='confirmed'),
+  load('/home/ziman/dev/COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv') %>%
+    mutate(type='deaths'),
+  load('/home/ziman/dev/COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv') %>%
+    mutate(type='recovered')
+)
+countries <- read_csv('/home/ziman/dev/COVID-19/nations1.csv') %>%
+  arrange(year) %>%
+  group_by(country, iso2c) %>%
+  summarise(population = last(population)) %>%
+  ungroup() %>%
+  mutate(country = case_when(
+    iso2c == 'IR' ~ 'Iran',
+    T ~ country
+  ))
+
+```
+```{r}
+plot_it <- function (the_country) {
+  new_confirmed <- xs %>%
+    filter(type == 'confirmed') %>%
+    filter(country == the_country) %>%
+    group_by(country, date, type) %>%
+    summarise(cases = sum(cases)) %>%
+    ungroup() %>%
+    mutate(
+      type = 'new_confirmed',
+      cases = cases - lag(cases)
+    )
+  new_recovered <- xs %>%
+    filter(type == 'recovered') %>%
+    filter(country == the_country) %>%
+    group_by(country, date, type) %>%
+    summarise(cases = sum(cases)) %>%
+    ungroup() %>%
+    mutate(
+      type = 'new_recovered',
+      cases = cases - lag(cases)
+    )
+  xs %>%
+    mutate(type = factor(type, c('recovered', 'confirmed', 'deaths'))) %>%
+    filter(country == the_country) %>%
+    group_by(country, date, type) %>%
+    summarise(cases = sum(cases)) %>%
+    ungroup() %>%
+    bind_rows(new_confirmed, new_recovered) %>%
+    filter(type %in% c('new_confirmed', 'new_recovered')) %>%
+    ggplot(aes(date, cases)) +
+    geom_bar(aes(fill=type), stat='identity', position='dodge') +
+    facet_grid(country ~ ., scales='free_y')
+}
+
+plot_it('Austria')
+```
+
+```{r}
+ys <- xs %>%
+  filter(
+    type == 'confirmed',
+    country %in% c(
+      'Iran', 'Austria',
+      'Netherlands', 'Italy', 'Germany', 'Slovakia', 'Spain',
+      'Belgium', 'France', 'United Kingdom'
+    )
+  ) %>%
+  group_by(country, date) %>%
+  summarise(cases = sum(cases)) %>%
+  ungroup() %>%
+  left_join(
+    countries,
+    by='country'
+  ) %>%
+  mutate(
+    cases_per_1meg = 1e6 * cases / population
+  ) %>%
+  inner_join(
+    .,
+    filter(., cases_per_1meg >= 1.0) %>%
+      group_by(country) %>%
+      summarise(first_case = min(date)) %>%
+      ungroup(),
+    by='country'
+  ) %>%
+  mutate(
+    days_since_start = as.numeric(date - first_case) / 86400
+  )
+
+last_date <- max(ys$date)
+
+ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=country)) +
+  geom_abline(data=tibble(x=1), slope=log10(1.33), intercept=log10(1), linetype='dashed') +
+  geom_text(aes(x,y), data=tibble(x=19, y=5e2, country=NA), label='+33%/day', size=2.5) +
+  geom_point() +
+  geom_line() +
+  geom_label_repel(
+    data=filter(ys, date == last_date),
+    aes(label=iso2c),
+    hjust=0.5,
+    vjust=0.5,
+    size=2,
+    label.padding=unit(0.1, 'lines'),
+    label.r=unit(0.05, 'lines'),
+    box.padding=0
+  ) +
+  scale_y_log10() +
+  expand_limits(x=23) +
+  ylab('confirmed cases') +
+  xlab('days since 1 case / 1M population') +
+  theme_minimal()
+```
+
