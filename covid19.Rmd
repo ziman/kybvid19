@@ -19,6 +19,18 @@ load <- function(fname) {
     mutate(date=as.POSIXct(strptime(date, '%m/%d/%y'))) %>%
     rename(cases=value)
 }
+
+# https://stackoverflow.com/a/24241954
+fancy_scientific <- function(l) {
+  # turn in to character string in scientific notation
+  l <- format(l, scientific = -1)
+  l <- gsub("^0*e\\+?0*$", "0", l)
+  # quote the part before the exponent to keep all the digits
+  l <- gsub("^1e\\+?(-?)0*(.*)$", "$10^{\\1\\2}$", l)
+  l <- gsub("^(.*)e\\+?(-?)0*(.*)$", "$\\1\\\\!\\\\times\\\\!10^{\\2\\3}$", l)
+  # return this as an expression
+  #parse(text=l)
+}
 ```
 
 ```{r}
@@ -151,8 +163,8 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=co
     box.padding=0,
     show.legend=F
   ) +
-  scale_y_log10(labels=comma) +
-  xlim(-10, 23) +
+  scale_y_log10(labels=function(x) signif(x, 1)) +
+  xlim(-5, 23) +
   ylab('confirmed cases per 1M population') +
   xlab('days since 1 case per 1M population') +
   theme_minimal()
