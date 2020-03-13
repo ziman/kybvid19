@@ -142,7 +142,7 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=co
   ) +
   geom_text(
     aes(x,y, colour=NA),
-    data=tibble(x=-5, y=133),
+    data=tibble(x=0, y=133),
     colour='red',
     size=3,
     label='national lockdown in Italy',
@@ -170,3 +170,6 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=co
   theme_minimal()
 ```
 
+```{r}
+ggsave('covid.png', dpi=96, width=10, height=6)
+```
