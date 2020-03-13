@@ -55,6 +55,7 @@ countries <- read_csv('nations1.csv') %>%
   mutate(country = case_when(
     iso2c == 'IR' ~ 'Iran',
     iso2c == 'SK' ~ 'Slovakia',
+    iso2c == 'CZ' ~ 'Czechia',
     T ~ country
   ))
 
@@ -104,7 +105,8 @@ ys <- xs %>%
     country %in% c(
       'Iran', 'Austria',
       'Netherlands', 'Italy', 'Germany', 'Slovakia', 'Spain',
-      'Belgium', 'France', 'United Kingdom', 'United States'
+      'Belgium', 'France', 'United Kingdom', 'United States',
+      'Czechia'
     )
   ) %>%
   group_by(country, date) %>%
@@ -155,8 +157,8 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=co
     nudge_y=0.2,
     alpha=0.5
   ) +
+  geom_line(alpha=0.75) +
   geom_point() +
-  geom_line() +
   geom_label_repel(
     data=filter(ys, date == last_date),
     aes(label=iso2c),
