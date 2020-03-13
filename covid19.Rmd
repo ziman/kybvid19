@@ -41,7 +41,12 @@ xs <- bind_rows(
     mutate(type='deaths'),
   load('data/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv') %>%
     mutate(type='recovered')
-)
+) %>%
+  mutate(country = case_when(
+    country == 'US' ~ 'United States',
+    T ~ country
+  ))
+
 countries <- read_csv('nations1.csv') %>%
   arrange(year) %>%
   group_by(country, iso2c) %>%
@@ -99,7 +104,7 @@ ys <- xs %>%
     country %in% c(
       'Iran', 'Austria',
       'Netherlands', 'Italy', 'Germany', 'Slovakia', 'Spain',
-      'Belgium', 'France', 'United Kingdom'
+      'Belgium', 'France', 'United Kingdom', 'United States'
     )
   ) %>%
   group_by(country, date) %>%
