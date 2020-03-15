@@ -39,7 +39,6 @@ countries <- read_csv('nations1.csv') %>%
 
 ys <- xs %>%
   filter(
-    type == 'confirmed',
     country %in% c(
       'Iran', 'Austria',
       'Netherlands', 'Italy', 'Germany', 'Slovakia', 'Spain',
@@ -47,7 +46,7 @@ ys <- xs %>%
       'Czechia'
     )
   ) %>%
-  group_by(country, date) %>%
+  group_by(country, date, type) %>%
   summarise(cases = sum(cases)) %>%
   ungroup() %>%
   filter(cases > 0) %>%
@@ -61,10 +60,10 @@ ys <- xs %>%
   inner_join(
     .,
     filter(., cases_per_1meg >= 1.0) %>%
-      group_by(country) %>%
+      group_by(country, type) %>%
       summarise(first_case = min(date)) %>%
       ungroup(),
-    by='country'
+    by=c('country', 'type')
   ) %>%
   mutate(
     days_since_start = as.numeric(date - first_case) / 86400
@@ -72,22 +71,23 @@ ys <- xs %>%
 
 last_date <- max(ys$date)
 
-cdata <- ys %>% filter(country == 'United Kingdom', days_since_start >= 5)
-m <- lm(log(cases_per_1meg) ~ days_since_start, data=cdata)
+cdata <- ys %>% filter(country == 'Netherlands')
+m <- lm(log(cases_per_1meg) ~ days_since_start, data=cdata %>% filter(days_since_start >= 0, type=='confirmed'))
 summary(m)
 
 prediction <- tibble(
   days_since_start = cdata %>% pull(days_since_start),
-  cases_per_1meg = exp(m$coefficients[1] + m$coefficients[2] * cdata$days_since_start)
+  cases_per_1meg = exp(m$coefficients[1] + m$coefficients[2] * cdata$days_since_start),
+  type='predicted'
 )
 
-ggplot(NULL, aes(days_since_start, cases_per_1meg)) +
+ggplot(NULL, aes(days_since_start, cases_per_1meg, colour=type)) +
   geom_point(data=cdata) +
   geom_line(data=cdata) +
   geom_point(data=prediction) +
   geom_line(data=prediction, linetype='dashed') +
   theme_minimal()
-  # scale_y_log10()
+  scale_y_log10()
 
 ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=country)) +
   geom_abline(data=tibble(x=1), slope=log10(1.33), intercept=log10(1), linetype='dashed', alpha=.5) +

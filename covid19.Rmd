@@ -57,6 +57,9 @@ countries <- read_csv('nations1.csv') %>%
     iso2c == 'SK' ~ 'Slovakia',
     iso2c == 'CZ' ~ 'Czechia',
     T ~ country
+  ), iso2c = case_when(
+    iso2c == 'GB' ~ 'UK',
+    T ~ iso2c
   ))
 
 ```
@@ -106,7 +109,7 @@ ys <- xs %>%
       'Iran', 'Austria',
       'Netherlands', 'Italy', 'Germany', 'Slovakia', 'Spain',
       'Belgium', 'France', 'United Kingdom', 'United States',
-      'Czechia'
+      'Czechia', 'Switzerland'
     )
   ) %>%
   group_by(country, date) %>%
@@ -129,7 +132,8 @@ ys <- xs %>%
     by='country'
   ) %>%
   mutate(
-    days_since_start = as.numeric(date - first_case) / 86400
+    days_since_start = as.numeric(date - first_case) / 86400,
+    country = paste(iso2c, ' - ', country, sep='')
   )
 
 last_date <- max(ys$date)
@@ -159,7 +163,7 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=co
   ) +
   geom_line(alpha=0.75) +
   geom_point() +
-  geom_label_repel(
+  geom_label(
     data=filter(ys, date == last_date),
     aes(label=iso2c),
     hjust=0.5,
@@ -173,7 +177,7 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=co
   scale_y_log10(labels=function(x) signif(x, 1)) +
   xlim(-5, 23) +
   ylab('confirmed cases per 1M population') +
-  xlab('days since 1 case per 1M population') +
+  xlab('days since ≥1 cases per 1M population') +
   theme_minimal()
 ```
 
