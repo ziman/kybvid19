@@ -1,7 +1,6 @@
 library(tidyverse)
 library(ggrepel)
 require(scales)
-knitr::opts_chunk$set(echo = FALSE)
 
 load <- function(fname) {
   xs_raw <- read_csv(fname)
@@ -10,18 +9,6 @@ load <- function(fname) {
     pivot_longer(c(-province, -country, -lat, -lon), names_to='date') %>%
     mutate(date=as.POSIXct(strptime(date, '%m/%d/%y'))) %>%
     rename(cases=value)
-}
-
-# https://stackoverflow.com/a/24241954
-fancy_scientific <- function(l) {
-  # turn in to character string in scientific notation
-  l <- format(l, scientific = -1)
-  l <- gsub("^0*e\\+?0*$", "0", l)
-  # quote the part before the exponent to keep all the digits
-  l <- gsub("^1e\\+?(-?)0*(.*)$", "$10^{\\1\\2}$", l)
-  l <- gsub("^(.*)e\\+?(-?)0*(.*)$", "$\\1\\\\!\\\\times\\\\!10^{\\2\\3}$", l)
-  # return this as an expression
-  #parse(text=l)
 }
 
 xs <- bind_rows(
@@ -51,42 +38,6 @@ countries <- read_csv('nations1.csv') %>%
     iso2c == 'GB' ~ 'UK',
     T ~ iso2c
   ))
-
-plot_it <- function (the_country) {
-  new_confirmed <- xs %>%
-    filter(type == 'confirmed') %>%
-    filter(country == the_country) %>%
-    group_by(country, date, type) %>%
-    summarise(cases = sum(cases)) %>%
-    ungroup() %>%
-    mutate(
-      type = 'new_confirmed',
-      cases = cases - lag(cases)
-    )
-  new_recovered <- xs %>%
-    filter(type == 'recovered') %>%
-    filter(country == the_country) %>%
-    group_by(country, date, type) %>%
-    summarise(cases = sum(cases)) %>%
-    ungroup() %>%
-    mutate(
-      type = 'new_recovered',
-      cases = cases - lag(cases)
-    )
-  xs %>%
-    mutate(type = factor(type, c('recovered', 'confirmed', 'deaths'))) %>%
-    filter(country == the_country) %>%
-    group_by(country, date, type) %>%
-    summarise(cases = sum(cases)) %>%
-    ungroup() %>%
-    bind_rows(new_confirmed, new_recovered) %>%
-    filter(type %in% c('new_confirmed', 'new_recovered')) %>%
-    ggplot(aes(date, cases)) +
-    geom_bar(aes(fill=type), stat='identity', position='dodge') +
-    facet_grid(country ~ ., scales='free_y')
-}
-
-plot_it('Austria')
 
 ys <- xs %>%
   filter(
