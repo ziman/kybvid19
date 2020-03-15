@@ -1,11 +1,3 @@
----
-title: "covid19"
-author: "ziman"
-date: "11 March 2020"
-output: html_document
----
-
-```{r setup, include=FALSE}
 library(tidyverse)
 library(ggrepel)
 require(scales)
@@ -31,9 +23,7 @@ fancy_scientific <- function(l) {
   # return this as an expression
   #parse(text=l)
 }
-```
 
-```{r}
 xs <- bind_rows(
   load('data/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv') %>%
     mutate(type='confirmed'),
@@ -62,8 +52,6 @@ countries <- read_csv('nations1.csv') %>%
     T ~ iso2c
   ))
 
-```
-```{r}
 plot_it <- function (the_country) {
   new_confirmed <- xs %>%
     filter(type == 'confirmed') %>%
@@ -99,9 +87,7 @@ plot_it <- function (the_country) {
 }
 
 plot_it('Austria')
-```
 
-```{r}
 ys <- xs %>%
   filter(
     type == 'confirmed',
@@ -179,8 +165,5 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=co
   ylab('confirmed cases per 1M population') +
   xlab('days since ≥1 cases per 1M population') +
   theme_minimal()
-```
 
-```{r}
 ggsave('covid.png', dpi=96, width=10, height=6)
-```
