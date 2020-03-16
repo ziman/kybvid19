@@ -46,7 +46,9 @@ ys <- xs %>%
       'Iran', 'Austria',
       'Netherlands', 'Italy', 'Germany', 'Slovakia', 'Spain',
       'Belgium', 'France', 'United Kingdom', 'United States',
-      'Czechia', 'Switzerland'
+      'Czechia', 'Switzerland',
+      'Norway', 'Denmark', 'Sweden', 'Finland'
+#      'Slovakia', 'Italy'
     )
   ) %>%
   group_by(country, date) %>%
@@ -78,7 +80,7 @@ last_date <- max(ys$date)
 ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=country)) +
   geom_abline(data=tibble(x=1), slope=log10(1.33), intercept=log10(1), linetype='dashed', alpha=.5) +
   geom_text(
-    aes(x,y), data=tibble(x=19, y=5e2, country=NA),
+    aes(x,y), data=tibble(x=20.5, y=5e2, country=NA),
     label='+33%/day', size=2.5, show.legend=F
   ) +
   geom_hline(
@@ -94,8 +96,7 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=co
     colour='red',
     size=3,
     label='national lockdown in Italy',
-    vjust=1.0,
-    nudge_y=0.2,
+    vjust=-0.5,
     alpha=0.5
   ) +
   geom_line(alpha=0.75) +
@@ -118,6 +119,8 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=co
   ) +
   ylab('confirmed cases per 1M population') +
   xlab('days since ≥1 cases per 1M population') +
+  ggtitle(paste('Up to and including', max(ys$date))) +
   theme_minimal()
 
 ggsave('covid.png', dpi=96, width=10, height=8)
+ggsave('covid-sk-it.png', dpi=96, width=7, height=5)
