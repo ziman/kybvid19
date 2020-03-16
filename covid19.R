@@ -5,7 +5,7 @@ require(scales)
 theme_kybcae <- theme_minimal() +
   theme(
     plot.background = element_rect(fill='black'),
-    panel.grid.major = element_line(colour='#444444'),
+    panel.grid.major = element_line(colour='#333333'),
     panel.grid.minor = element_line(colour='#222222'),
     text = element_text(colour='#6DAE42', family='Tahoma', size=10)
   )
@@ -86,7 +86,13 @@ ys <- xs %>%
 last_date <- max(ys$date)
 
 ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=country)) +
-  geom_abline(data=tibble(x=1), slope=log10(1.33), intercept=log10(1), linetype='dotted', alpha=.5) +
+  geom_abline(
+    data=tibble(x=1),
+    slope=log10(1.33),
+    intercept=log10(1),
+    linetype='dotted',
+    colour='gray'
+  ) +
   geom_text(
     aes(x,y), data=tibble(x=20.5, y=5e2, country=NA),
     label='+33%/day', size=2.5, show.legend=F
@@ -95,8 +101,7 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=co
     data=tibble(x=1),
     yintercept = 1e6 * 8000 / 60e6,
     linetype='dashed',
-    colour='red',
-    alpha=0.5
+    colour='red'
   ) +
   geom_text(
     aes(x,y, colour=NA),
