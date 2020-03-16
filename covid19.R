@@ -121,7 +121,6 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=co
     size=2.3,
     label.padding=unit(0.1, 'lines'),
     label.r=unit(0.05, 'lines'),
-    box.padding=0,
     show.legend=F,
     fill='black'
   ) +
