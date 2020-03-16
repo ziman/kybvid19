@@ -136,4 +136,4 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=co
   theme_kybcae
 
 ggsave('covid.png', dpi=96, width=10, height=8)
-ggsave('covid-sk-it.png', dpi=96, width=7, height=5)
+#ggsave('covid-sk-it.png', dpi=96, width=7, height=5)
