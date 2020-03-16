@@ -114,7 +114,7 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=co
   xlim(-5, 23) +
   scale_y_log10(
     labels=function(x) signif(x, 1),
-    limits=c(0.1, 1000)
+    limits=c(0.3, 1000)
   ) +
   ylab('confirmed cases per 1M population') +
   xlab('days since ≥1 cases per 1M population') +
