@@ -111,10 +111,13 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=co
     box.padding=0,
     show.legend=F
   ) +
-  scale_y_log10(labels=function(x) signif(x, 1)) +
   xlim(-5, 23) +
+  scale_y_log10(
+    labels=function(x) signif(x, 1),
+    limits=c(0.1, 1000)
+  ) +
   ylab('confirmed cases per 1M population') +
   xlab('days since ≥1 cases per 1M population') +
   theme_minimal()
 
-ggsave('covid.png', dpi=96, width=10, height=6)
+ggsave('covid.png', dpi=96, width=10, height=8)
