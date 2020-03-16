@@ -2,6 +2,14 @@ library(tidyverse)
 library(ggrepel)
 require(scales)
 
+theme_kybcae <- theme_minimal() +
+  theme(
+    plot.background = element_rect(fill='black'),
+    panel.grid.major = element_line(colour='#444444'),
+    panel.grid.minor = element_line(colour='#222222'),
+    text = element_text(colour='#6DAE42', family='Tahoma', size=10)
+  )
+
 load <- function(fname) {
   xs_raw <- read_csv(fname)
   colnames(xs_raw)[1:4] <- c('province', 'country', 'lat', 'lon')
@@ -96,8 +104,7 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=co
     colour='red',
     size=3,
     label='national lockdown in Italy',
-    vjust=-0.5,
-    alpha=0.5
+    vjust=-0.5
   ) +
   geom_line(alpha=0.75) +
   geom_point() +
@@ -106,11 +113,12 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=co
     aes(label=iso2c),
     hjust=0.5,
     vjust=0.5,
-    size=2,
+    size=2.3,
     label.padding=unit(0.1, 'lines'),
     label.r=unit(0.05, 'lines'),
     box.padding=0,
-    show.legend=F
+    show.legend=F,
+    fill='black'
   ) +
   xlim(-5, 23) +
   scale_y_log10(
@@ -120,7 +128,7 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=co
   ylab('confirmed cases per 1M population') +
   xlab('days since ≥1 cases per 1M population') +
   ggtitle(paste('Up to and including', max(ys$date))) +
-  theme_minimal()
+  theme_kybcae
 
 ggsave('covid.png', dpi=96, width=10, height=8)
 ggsave('covid-sk-it.png', dpi=96, width=7, height=5)
