@@ -51,12 +51,14 @@ ys <- xs %>%
   filter(
     type == 'confirmed',
     country %in% c(
-      'Iran', 'Austria',
-      'Netherlands', 'Italy', 'Germany', 'Slovakia', 'Spain',
-      'Belgium', 'France', 'United Kingdom', 'United States',
-      'Czechia', 'Switzerland',
-      'Norway', 'Denmark', 'Sweden', 'Finland'
+#      'Iran', 'Austria',
+#      'Netherlands', 'Italy', 'Germany', 'Slovakia', 'Spain',
+#      'Belgium', 'France', 'United Kingdom', 'United States',
+#      'Czechia', 'Switzerland',
+#      'Norway', 'Denmark', 'Sweden', 'Finland'
 #      'Slovakia', 'Italy'
+      'Slovakia', 'Czechia', 'Italy', 'United Kingdom',
+      'Netherlands', 'Spain', 'France'
     )
   ) %>%
   group_by(country, date) %>%
@@ -80,12 +82,13 @@ ys <- xs %>%
   ) %>%
   mutate(
     days_since_start = as.numeric(date - first_case) / 86400,
-    country = paste(iso2c, ' - ', country, sep='')
+    country = paste(iso2c, ' - ', country, sep=''),
+    markcol = if_else(date >= max(date) - 4*86400, country, NA_character_)
   )
 
 last_date <- max(ys$date)
 
-ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=country)) +
+ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=markcol, group=country)) +
   geom_abline(
     data=tibble(x=1),
     slope=log10(1.33),
@@ -94,7 +97,7 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=co
     colour='gray'
   ) +
   geom_text(
-    aes(x,y), data=tibble(x=20.5, y=5e2, country=NA),
+    aes(x,y), data=tibble(x=20.5, y=5e2, country=NA, markcol=NA),
     label='+33%/day', size=2.5, show.legend=F
   ) +
   geom_hline(
@@ -104,14 +107,14 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=co
     colour='red'
   ) +
   geom_text(
-    aes(x,y, colour=NA),
+    aes(x,y, colour=NA, group=NA),
     data=tibble(x=0, y=133),
     colour='red',
     size=3,
     label='national lockdown in Italy',
     vjust=-0.5
   ) +
-  geom_line(alpha=0.75) +
+  geom_line(alpha=0.5) +
   geom_point() +
   geom_label(
     data=filter(ys, date == last_date),
@@ -132,6 +135,7 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=co
   ylab('confirmed cases per 1M population') +
   xlab('days since ≥1 cases per 1M population') +
   ggtitle(paste('Up to and including', max(ys$date))) +
+  scale_colour_discrete(name='country') +
   theme_kybcae
 
 ggsave('covid.png', dpi=96, width=8, height=6)
