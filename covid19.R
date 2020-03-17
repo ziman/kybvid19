@@ -83,12 +83,14 @@ ys <- xs %>%
   mutate(
     days_since_start = as.numeric(date - first_case) / 86400,
     country = paste(iso2c, ' - ', country, sep=''),
-    markcol = if_else(date >= max(date) - 4*86400, country, NA_character_)
+    marked = date >= max(date) - 4*86400,
+    markcol = if_else(marked, country, NA_character_),
+    marksize = if_else(marked, 1, 0.5)
   )
 
 last_date <- max(ys$date)
 
-ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=markcol, group=country)) +
+ggplot(ys %>% filter(cases > 0), aes(days_since_start)) +
   geom_abline(
     data=tibble(x=1),
     slope=log10(1.33),
@@ -97,7 +99,7 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=ma
     colour='gray'
   ) +
   geom_text(
-    aes(x,y), data=tibble(x=20.5, y=5e2, country=NA, markcol=NA),
+    aes(x,y), data=tibble(x=20.5, y=5e2),
     label='+33%/day', size=2.5, show.legend=F
   ) +
   geom_hline(
@@ -107,18 +109,18 @@ ggplot(ys %>% filter(cases > 0), aes(days_since_start, cases_per_1meg, colour=ma
     colour='red'
   ) +
   geom_text(
-    aes(x,y, colour=NA, group=NA),
+    aes(x,y),
     data=tibble(x=0, y=133),
     colour='red',
     size=3,
     label='national lockdown in Italy',
     vjust=-0.5
   ) +
-  geom_line(alpha=0.5) +
-  geom_point() +
+  geom_line(aes(y=cases_per_1meg, colour=country), alpha=0.5) +
+  geom_point(aes(y=cases_per_1meg, colour=country)) +
   geom_label(
     data=filter(ys, date == last_date),
-    aes(label=iso2c),
+    aes(label=iso2c, y=cases_per_1meg, colour=country),
     hjust=0.5,
     vjust=0.5,
     size=2.3,
