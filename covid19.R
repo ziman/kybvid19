@@ -182,7 +182,7 @@ ggplot(ys %>% filter(cases > 0, marked), aes(days_since_end)) +
   xlim(-7, 15) +
   ylab('confirmed cases per 1M population') +
   xlab('days since latest data update') +
-  ggtitle(paste('Up to and including', max(ys$date))) +
+  ggtitle(paste('Last update: ', max(ys$date))) +
   scale_colour_discrete(name='country') +
   theme_kybcae
 
