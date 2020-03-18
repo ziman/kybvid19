@@ -125,18 +125,6 @@ ggplot(ys %>% filter(cases > 0, marked), aes(days_since_start)) +
     label='national lockdown in Italy',
     vjust=-0.5
   ) +
-  geom_text(
-    data=ahead,
-    aes(
-      x=svk$days_since_start + days_ahead,
-      y=cases_per_1meg,
-      label=paste(signif(days_ahead, 2), ' days ahead of SK', sep=''),
-      colour=country
-    ),
-    size=3,
-    hjust=1,
-    nudge_x=-0.2
-  ) +
   geom_segment(
     data=ahead,
     aes(
@@ -171,10 +159,21 @@ ggplot(ys %>% filter(cases > 0, marked), aes(days_since_start)) +
     show.legend=F,
     fill='black'
   ) +
-  #xlim(-5, 23) +
+  geom_text(
+    data=ahead,
+    aes(
+      x=svk$days_since_start + days_ahead,
+      y=cases_per_1meg,
+      label=paste(signif(days_ahead, 2), ' days ahead of SK', sep=''),
+      colour=country
+    ),
+    size=3,
+    hjust=1,
+    nudge_x=-0.2,
+    show.legend=F
+  ) +
   scale_y_log10(
     labels=function(x) signif(x, 1)
-    #limits=c(0.3, 1000)
   ) +
   ylab('confirmed cases per 1M population') +
   xlab('days since ≥1 cases per 1M population') +
