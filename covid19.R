@@ -58,7 +58,8 @@ ys <- xs %>%
 #      'Norway', 'Denmark', 'Sweden', 'Finland'
 #      'Slovakia', 'Italy'
       'Slovakia', 'Czechia', 'Italy', 'United Kingdom',
-      'Netherlands', 'Spain', 'France', 'United States'
+      'Netherlands', 'Spain', 'France', 'United States',
+      'Denmark', 'Norway', 'Sweden', 'Finland'
     )
   ) %>%
   group_by(country, date) %>%
@@ -123,7 +124,7 @@ ggplot(ys %>% filter(cases > 0, marked), aes(days_since_end)) +
   ) +
   geom_text(
     aes(x,y),
-    data=tibble(x=svk$days_since_end, y=133),
+    data=tibble(x=13, y=133),
     colour='red',
     size=3,
     label='national lockdown in Italy',
@@ -132,7 +133,7 @@ ggplot(ys %>% filter(cases > 0, marked), aes(days_since_end)) +
   geom_segment(
     data=ahead,
     aes(
-      x=days_since_end,
+      x=days_since_end + 0.6,
       xend=svk$days_since_end + days_ahead,
       y=cases_per_1meg,
       yend=cases_per_1meg,
@@ -152,29 +153,33 @@ ggplot(ys %>% filter(cases > 0, marked), aes(days_since_end)) +
   ) +
   geom_line(aes(y=cases_per_1meg, colour=country), alpha=0.5) +
   geom_point(aes(y=cases_per_1meg, colour=country)) +
-  geom_label(
+  geom_text_repel(
     data=latest,
-    aes(label=iso2c, y=cases_per_1meg, colour=country),
+    aes(label=iso2c, y=cases_per_1meg, colour=country, segment.color=country),
     hjust=0.5,
     vjust=0.5,
+    nudge_x=0.3,
     size=2.5,
     label.padding=unit(0.1, 'lines'),
     label.r=unit(0.05, 'lines'),
     show.legend=F,
-    fill='black'
+    fill='black',
+    box.padding=0
   ) +
-  geom_text(
+  geom_text_repel(
     data=ahead,
     aes(
       x=svk$days_since_end + days_ahead,
       y=cases_per_1meg,
       label=paste(signif(days_ahead, 2), ' days ahead of SK', sep=''),
-      colour=country
+      colour=country,
+      segment.color=country
     ),
     size=3,
     hjust=0,
     nudge_x=0.2,
-    show.legend=F
+    show.legend=F,
+    box.padding=0
   ) +
   scale_y_log10(
     labels=function(x) signif(x, 1)
