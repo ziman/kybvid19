@@ -181,11 +181,11 @@ ggplot(ys %>% filter(cases > 0, marked), aes(days_since_end)) +
   ) +
   xlim(-7, 15) +
   ylab('confirmed cases per 1M population') +
-  xlab('days since ≥1 cases per 1M population') +
+  xlab('days since latest data update') +
   ggtitle(paste('Up to and including', max(ys$date))) +
   scale_colour_discrete(name='country') +
   theme_kybcae
 
-ggsave('covid.png', dpi=96, width=8, height=6)
+ggsave('covid-ahead.png', dpi=96, width=8, height=6)
 #ggsave('covid.png', dpi=96, width=10, height=8)
 #ggsave('covid-sk-it.png', dpi=96, width=7, height=5)
