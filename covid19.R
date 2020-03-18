@@ -133,7 +133,7 @@ ggplot(ys %>% filter(cases > 0, marked), aes(days_since_end)) +
   geom_segment(
     data=ahead,
     aes(
-      x=days_since_end + 0.6,
+      x=days_since_end + 0.8,
       xend=svk$days_since_end + days_ahead,
       y=cases_per_1meg,
       yend=cases_per_1meg,
@@ -158,7 +158,7 @@ ggplot(ys %>% filter(cases > 0, marked), aes(days_since_end)) +
     aes(label=iso2c, y=cases_per_1meg, colour=country, segment.color=country),
     hjust=0.5,
     vjust=0.5,
-    nudge_x=0.3,
+    nudge_x=0.5,
     size=2.5,
     label.padding=unit(0.1, 'lines'),
     label.r=unit(0.05, 'lines'),
