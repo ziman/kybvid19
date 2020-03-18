@@ -70,11 +70,12 @@ ys <- xs %>%
     by='country'
   ) %>%
   mutate(
-    cases_per_1meg = 1e6 * cases / population
+    cases_per_1meg = 1e6 * cases / population,
+    marked = date >= max(date) - 7*86400
   ) %>%
   inner_join(
     .,
-    filter(., cases_per_1meg >= 1.0) %>%
+    filter(., marked) %>%
       group_by(country) %>%
       summarise(first_case = min(date), first_case_count = min(cases)) %>%
       ungroup(),
@@ -83,7 +84,6 @@ ys <- xs %>%
   mutate(
     days_since_start = as.numeric(date - first_case) / 86400,
     country = paste(iso2c, ' - ', country, sep=''),
-    marked = date >= max(date) - 4*86400,
     markcol = if_else(marked, country, NA_character_),
     marksize = if_else(marked, 1, 0.5)
   )
@@ -92,7 +92,9 @@ latest <- ys %>%
   mutate(rate = (cases / first_case_count) ** (1 / days_since_start)) %>%
   filter(date == max(date))
 
-svk <- latest %>% filter(iso2c == 'SK')
+svk <- latest %>%
+  filter(iso2c == 'SK')
+  
 ahead <- latest %>%
   filter(iso2c != 'SK') %>%
   mutate(
@@ -140,9 +142,9 @@ ggplot(ys %>% filter(cases > 0, marked), aes(days_since_start)) +
     data=ahead,
     aes(
       x=svk$days_since_start + days_ahead,
-      y=cases_per_1meg
+      y=cases_per_1meg,
+      colour=country
     ),
-    colour='gray',
     shape=1,
     alpha=0.8
   ) +
@@ -168,8 +170,8 @@ ggplot(ys %>% filter(cases > 0, marked), aes(days_since_start)) +
       colour=country
     ),
     size=3,
-    hjust=1,
-    nudge_x=-0.2,
+    hjust=0,
+    nudge_x=0.1,
     show.legend=F
   ) +
   scale_y_log10(
