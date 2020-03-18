@@ -58,7 +58,7 @@ ys <- xs %>%
 #      'Norway', 'Denmark', 'Sweden', 'Finland'
 #      'Slovakia', 'Italy'
       'Slovakia', 'Czechia', 'Italy', 'United Kingdom',
-      'Netherlands', 'Spain', 'France'
+      'Netherlands', 'Spain', 'France', 'United States'
     )
   ) %>%
   group_by(country, date) %>%
