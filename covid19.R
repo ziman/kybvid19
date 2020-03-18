@@ -59,7 +59,8 @@ ys <- xs %>%
 #      'Slovakia', 'Italy'
       'Slovakia', 'Czechia', 'Italy', 'United Kingdom',
       'Netherlands', 'Spain', 'France', 'United States',
-      'Denmark', 'Norway', 'Sweden', 'Finland'
+      'Denmark', 'Norway', 'Sweden', 'Finland',
+      'Switzerland', 'Belgium', 'Austria'
     )
   ) %>%
   group_by(country, date) %>%
@@ -124,11 +125,12 @@ ggplot(ys %>% filter(cases > 0, marked), aes(days_since_end)) +
   ) +
   geom_text(
     aes(x,y),
-    data=tibble(x=13, y=133),
+    data=tibble(x=15, y=133),
     colour='red',
     size=3,
-    label='national lockdown in Italy',
-    vjust=-0.5
+    label='IT lockdown',
+    vjust=1.5,
+    hjust=1
   ) +
   geom_segment(
     data=ahead,
