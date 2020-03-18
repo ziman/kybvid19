@@ -77,12 +77,13 @@ ys <- xs %>%
     .,
     filter(., marked) %>%
       group_by(country) %>%
-      summarise(first_case = min(date), first_case_count = min(cases)) %>%
+      summarise(first_case = min(date), last_case = max(date), first_case_count = min(cases)) %>%
       ungroup(),
     by='country'
   ) %>%
   mutate(
     days_since_start = as.numeric(date - first_case) / 86400,
+    days_since_end = as.numeric(date - last_case) / 86400,
     country = paste(iso2c, ' - ', country, sep=''),
     markcol = if_else(marked, country, NA_character_),
     marksize = if_else(marked, 1, 0.5)
@@ -101,13 +102,14 @@ ahead <- latest %>%
     days_ahead = log(cases_per_1meg / svk$cases_per_1meg) / log(svk$rate)
   )
 
-ggplot(ys %>% filter(cases > 0, marked), aes(days_since_start)) +
+ggplot(ys %>% filter(cases > 0, marked), aes(days_since_end)) +
   geom_abline(
     data=tibble(x=1),
     slope=log10(svk$rate),
-    intercept=log10(1e6 * svk$first_case_count / svk$population),
+    intercept=log10(svk$cases_per_1meg),
     linetype='dashed',
-    colour='gray'
+    colour='gray',
+    alpha=0.5
   ) +
   geom_text(
     aes(x,y), data=tibble(x=20.5, y=5e2),
@@ -121,7 +123,7 @@ ggplot(ys %>% filter(cases > 0, marked), aes(days_since_start)) +
   ) +
   geom_text(
     aes(x,y),
-    data=tibble(x=svk$days_since_start, y=133),
+    data=tibble(x=svk$days_since_end, y=133),
     colour='red',
     size=3,
     label='national lockdown in Italy',
@@ -130,8 +132,8 @@ ggplot(ys %>% filter(cases > 0, marked), aes(days_since_start)) +
   geom_segment(
     data=ahead,
     aes(
-      x=days_since_start,
-      xend=svk$days_since_start + days_ahead,
+      x=days_since_end,
+      xend=svk$days_since_end + days_ahead,
       y=cases_per_1meg,
       yend=cases_per_1meg,
       colour=country
@@ -141,7 +143,7 @@ ggplot(ys %>% filter(cases > 0, marked), aes(days_since_start)) +
   geom_point(
     data=ahead,
     aes(
-      x=svk$days_since_start + days_ahead,
+      x=svk$days_since_end + days_ahead,
       y=cases_per_1meg,
       colour=country
     ),
@@ -164,19 +166,20 @@ ggplot(ys %>% filter(cases > 0, marked), aes(days_since_start)) +
   geom_text(
     data=ahead,
     aes(
-      x=svk$days_since_start + days_ahead,
+      x=svk$days_since_end + days_ahead,
       y=cases_per_1meg,
       label=paste(signif(days_ahead, 2), ' days ahead of SK', sep=''),
       colour=country
     ),
     size=3,
     hjust=0,
-    nudge_x=0.1,
+    nudge_x=0.2,
     show.legend=F
   ) +
   scale_y_log10(
     labels=function(x) signif(x, 1)
   ) +
+  xlim(-7, 15) +
   ylab('confirmed cases per 1M population') +
   xlab('days since ≥1 cases per 1M population') +
   ggtitle(paste('Up to and including', max(ys$date))) +
