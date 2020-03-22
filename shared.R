@@ -156,16 +156,13 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
     ) +
     geom_line(aes(y=cases_per_1meg, colour=country), alpha=0.5) +
     geom_point(aes(y=cases_per_1meg, colour=country)) +
-    geom_label_repel(
+    geom_text_repel(
       data=latest,
       aes(label=iso2c, y=cases_per_1meg, colour=country),
       hjust=0.5,
       vjust=0.5,
       size=2.5,
-      label.padding=unit(0.1, 'lines'),
-      label.r=unit(0.05, 'lines'),
       show.legend=F,
-      fill='black'
     ) +
     geom_text_repel(
       data=ahead,
@@ -191,7 +188,8 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
     xlab('days since latest data update') +
     ggtitle(paste('Last update: ', max(ys$date))) +
     scale_colour_discrete(name='country') +
-    theme_kybcae
+    theme_kybcae +
+    guides(colour=F)
   
   ggsave(
     paste(rtype, '-', focus, '.png', sep=''),
