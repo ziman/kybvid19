@@ -11,6 +11,7 @@ while true; do
 	R -q -e 'source("nl.R")'
 	scp covid-ahead.png functor.sk:/var/www/kybvid19
 	scp covid-nl.png functor.sk:/var/www/kybvid19
+	scp covid-deaths.png functor.sk:/var/www/kybvid19
 
 	sleep 3600 || break
 done
