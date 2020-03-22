@@ -7,12 +7,15 @@ cd "$(dirname "$0")"
 while true; do
 	date
 	(cd data; git pull)
-	R -q -e 'source("covid19.R")'
-	R -q -e 'source("nl.R")'
-	scp covid-ahead.png functor.sk:/var/www/kybvid19
-	scp covid-nl.png functor.sk:/var/www/kybvid19
-	scp covid-nl-deaths.png functor.sk:/var/www/kybvid19
-	scp covid-deaths.png functor.sk:/var/www/kybvid19
+	#R -q -e 'source("covid19.R")'
+	#R -q -e 'source("nl.R")'
+	R -q -e 'source("plot.R")'
+
+	cp confirmed-SK.png covid-ahead.png
+	cp confirmed-NL.png covid-nl.png
+	cp deaths-NL.png covid-nl-deaths.png
+
+	scp index.html *.png functor.sk:/var/www/kybvid19
 
 	sleep 3600 || break
 done
