@@ -15,8 +15,8 @@ make_plot(
     'Norway'
   ),
   threshold=list(
-    label='IT lockdown',
-    x=13,
+    label='national lockdown in IT',
+    x=15,
     y=133
   )
 )
@@ -34,8 +34,8 @@ make_plot(
     'Norway'
   ),
   threshold=list(
-    label='IT lockdown',
-    x=20,
+    label='national lockdown in IT',
+    x=22,
     y=6.6
   ),
   rate_override = 1.3
@@ -54,8 +54,8 @@ make_plot(
     'Norway'
   ),
   threshold=list(
-    label='IT lockdown',
-    x=6,
+    label='national lockdown in IT',
+    x=8,
     y=133
   )
 )
@@ -73,7 +73,7 @@ make_plot(
     'Norway'
   ),
   threshold=list(
-    label='IT lockdown',
+    label='national lockdown in IT',
     x=6,
     y=6.6
   )
