@@ -154,15 +154,20 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
       shape=1,
       alpha=0.8
     ) +
-    geom_line(aes(y=cases_per_1meg, colour=country), alpha=0.5) +
-    geom_point(aes(y=cases_per_1meg, colour=country)) +
+    geom_line(
+      aes(y=cases_per_1meg, colour=country),
+      alpha=0.5
+    ) +
+    geom_point(
+      aes(y=cases_per_1meg, colour=country)
+    ) +
     geom_text_repel(
       data=latest,
       aes(label=iso2c, y=cases_per_1meg, colour=country),
       hjust=0.5,
       vjust=0.5,
       size=2.5,
-      show.legend=F,
+      show.legend=F
     ) +
     geom_text_repel(
       data=ahead,
