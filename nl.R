@@ -51,11 +51,12 @@ ys <- xs %>%
   filter(
     type == 'confirmed',
     country %in% c(
-      'Iran', 'Austria',
+      # 'Iran', 'Denmark', 'Finland'
+      'Austria',
       'Netherlands', 'Italy', 'Germany', 'Slovakia', 'Spain',
       'Belgium', 'France', 'United Kingdom', 'United States',
       'Czechia', 'Switzerland',
-      'Norway', 'Denmark', 'Finland'
+      'Norway'
 #      'Slovakia', 'Italy'
 #      'Slovakia', 'Czechia', 'Italy', 'United Kingdom',
 #      'Netherlands', 'Spain', 'France'
@@ -168,7 +169,11 @@ ggplot(ys %>% filter(cases > 0, marked), aes(days_since_end)) +
     aes(
       x=pmax(svk$days_since_end + days_ahead, days_since_end),
       y=cases_per_1meg,
-      label=paste(signif(days_ahead, 2), ' days ahead of NL', sep=''),
+      label=if_else(
+        days_ahead > 0,
+        paste(signif(days_ahead, 2), ' days ahead of NL', sep=''),
+        paste(signif(-days_ahead, 2), ' days behind NL', sep='')
+      ),
       colour=country
     ),
     size=3,
@@ -189,3 +194,151 @@ ggplot(ys %>% filter(cases > 0, marked), aes(days_since_end)) +
 ggsave('covid-nl.png', dpi=96, width=8, height=6)
 #ggsave('covid.png', dpi=96, width=10, height=8)
 #ggsave('covid-sk-it.png', dpi=96, width=7, height=5)
+
+ys <- xs %>%
+  filter(
+    type == 'deaths',
+    country %in% c(
+      # 'Iran', 'Denmark', 'Finland'
+      'Austria',
+      'Netherlands', 'Italy', 'Germany', 'Slovakia', 'Spain',
+      'Belgium', 'France', 'United Kingdom', 'United States',
+      'Czechia', 'Switzerland',
+      'Norway'
+      #      'Slovakia', 'Italy'
+      #      'Slovakia', 'Czechia', 'Italy', 'United Kingdom',
+      #      'Netherlands', 'Spain', 'France'
+    )
+  ) %>%
+  group_by(country, date) %>%
+  summarise(cases = sum(cases)) %>%
+  ungroup() %>%
+  filter(cases > 0) %>%
+  inner_join(
+    countries,
+    by='country'
+  ) %>%
+  mutate(
+    cases_per_1meg = 1e6 * cases / population,
+    marked = date >= max(date) - 7*86400
+  ) %>%
+  inner_join(
+    .,
+    filter(., marked) %>%
+      group_by(country) %>%
+      summarise(first_case = min(date), last_case = max(date), first_case_count = min(cases)) %>%
+      ungroup(),
+    by='country'
+  ) %>%
+  mutate(
+    days_since_start = as.numeric(date - first_case) / 86400,
+    days_since_end = as.numeric(date - last_case) / 86400,
+    country = paste(iso2c, ' - ', country, sep=''),
+    markcol = if_else(marked, country, NA_character_),
+    marksize = if_else(marked, 1, 0.5)
+  )
+
+latest <- ys %>%
+  mutate(rate = (cases / first_case_count) ** (1 / days_since_start)) %>%
+  filter(date == max(date))
+
+svk <- latest %>%
+  filter(iso2c == 'NL')
+
+ahead <- latest %>%
+  filter(iso2c != 'NL') %>%
+  mutate(
+    days_ahead = log(cases_per_1meg / svk$cases_per_1meg) / log(svk$rate)
+  )
+
+ggplot(ys %>% filter(cases > 0, marked), aes(days_since_end)) +
+  geom_abline(
+    data=tibble(x=1),
+    slope=log10(svk$rate),
+    intercept=log10(svk$cases_per_1meg),
+    linetype='dashed',
+    colour='gray',
+    alpha=0.5
+  ) +
+  geom_text(
+    aes(x,y), data=tibble(x=20.5, y=5e2),
+    label='+33%/day', size=2.5, show.legend=F
+  ) +
+  geom_hline(
+    data=tibble(x=1),
+    yintercept = 1e6 * 400 / 60e6,
+    linetype='dashed',
+    colour='red'
+  ) +
+  geom_text(
+    aes(x,y),
+    data=tibble(x=10, y=6.6),
+    colour='red',
+    size=3,
+    label='IT lockdown',
+    vjust=-0.5,
+    hjust=1
+  ) +
+  geom_segment(
+    data=ahead,
+    aes(
+      x=days_since_end,
+      xend=svk$days_since_end + days_ahead,
+      y=cases_per_1meg,
+      yend=cases_per_1meg,
+      colour=country
+    ),
+    linetype='dotted'
+  ) +
+  geom_point(
+    data=ahead,
+    aes(
+      x=svk$days_since_end + days_ahead,
+      y=cases_per_1meg,
+      colour=country
+    ),
+    shape=1,
+    alpha=0.8
+  ) +
+  geom_line(aes(y=cases_per_1meg, colour=country), alpha=0.5) +
+  geom_point(aes(y=cases_per_1meg, colour=country)) +
+  geom_label_repel(
+    data=latest,
+    aes(label=iso2c, y=cases_per_1meg, colour=country),
+    hjust=0.5,
+    vjust=0.5,
+    size=2.5,
+    label.padding=unit(0.1, 'lines'),
+    label.r=unit(0.05, 'lines'),
+    show.legend=F,
+    fill='black'
+  ) +
+  geom_text_repel(
+    data=ahead,
+    aes(
+      x=pmax(svk$days_since_end + days_ahead, days_since_end),
+      y=cases_per_1meg,
+      label=if_else(
+        days_ahead > 0,
+        paste(signif(days_ahead, 2), ' days ahead of NL', sep=''),
+        paste(signif(-days_ahead, 2), ' days behind NL', sep='')
+      ),
+      colour=country
+    ),
+    size=3,
+    hjust=0,
+    nudge_x=0.3,
+    show.legend=F
+  ) +
+  scale_y_log10(
+    labels=function(x) signif(x, 1),
+    limits=c(0.1, 100)
+  ) +
+  xlim(-7, 10) +
+  ylab('deaths per 1M population') +
+  xlab('days since latest data update') +
+  ggtitle(paste('Last update: ', max(ys$date))) +
+  scale_colour_discrete(name='country') +
+  theme_kybcae
+
+ggsave('covid-nl-deaths.png', dpi=96, width=8, height=6)

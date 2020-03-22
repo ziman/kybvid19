@@ -335,7 +335,7 @@ ggplot(ys %>% filter(cases > 0, marked), aes(days_since_end)) +
   scale_y_log10(
     labels=function(x) signif(x, 1)
   ) +
-  xlim(-7, 17) +
+  xlim(-7, 21.5) +
   ylab('deaths per 1M population') +
   xlab('days since latest data update') +
   ggtitle(paste('Number of deaths. Last update: ', max(ys$date))) +
