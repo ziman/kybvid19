@@ -186,6 +186,7 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
       nudge_x=0.3,
       show.legend=F
     ) +
+    xlim(-bdays, NA) +
     scale_y_log10(
       labels=function(x) signif(x, 1)
     ) +
