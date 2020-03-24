@@ -6,7 +6,8 @@ data <- load_wiki()
 data$rows[
   (data$rows$country == 'Slovakia')
   & (data$rows$date >= lubridate::ymd('2020-03-18'))
-  & (data$rows$type == 'deaths'),
+  & (data$rows$type == 'deaths')
+  & (data$rows$cases == 0),
   'cases'
 ] <- 1
 
