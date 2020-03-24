@@ -1,6 +1,6 @@
 source('shared.R')
 
-data <- load_data()
+data <- load_wiki()
 
 make_plot(
   data,
@@ -8,11 +8,8 @@ make_plot(
   rtype='confirmed',
   y_label='confirmed cases',
   countries=c(
-    'Austria',
-    'Netherlands', 'Italy', 'Germany', 'Slovakia', 'Spain',
-    'Belgium', 'France', 'United Kingdom', 'United States',
-    'Czechia', 'Switzerland',
-    'Norway'
+    'AT', 'IT', 'DE', 'SK', 'ES', 'BE', 'FR',
+    'UK', 'US', 'CZ', 'CH', 'NO'
   ),
   threshold=list(
     label='national lockdown in IT',
@@ -27,11 +24,8 @@ make_plot(
   rtype='deaths',
   y_label='deaths',
   countries=c(
-    'Austria',
-    'Netherlands', 'Italy', 'Germany', 'Slovakia', 'Spain',
-    'Belgium', 'France', 'United Kingdom', 'United States',
-    'Czechia', 'Switzerland',
-    'Norway'
+    'AT', 'IT', 'DE', 'SK', 'ES', 'BE', 'FR',
+    'UK', 'US', 'CZ', 'CH', 'NO'
   ),
   threshold=list(
     label='national lockdown in IT',
@@ -47,11 +41,8 @@ make_plot(
   rtype='confirmed',
   y_label='confirmed cases',
   countries=c(
-    'Austria',
-    'Netherlands', 'Italy', 'Germany', 'Slovakia', 'Spain',
-    'Belgium', 'France', 'United Kingdom', 'United States',
-    'Czechia', 'Switzerland',
-    'Norway'
+    'AT', 'IT', 'DE', 'SK', 'ES', 'BE', 'FR',
+    'UK', 'US', 'CZ', 'CH', 'NO'
   ),
   threshold=list(
     label='national lockdown in IT',
@@ -66,11 +57,8 @@ make_plot(
   rtype='deaths',
   y_label='deaths',
   countries=c(
-    'Austria',
-    'Netherlands', 'Italy', 'Germany', 'Slovakia', 'Spain',
-    'Belgium', 'France', 'United Kingdom', 'United States',
-    'Czechia', 'Switzerland',
-    'Norway'
+    'AT', 'IT', 'DE', 'SK', 'ES', 'BE', 'FR',
+    'UK', 'US', 'CZ', 'CH', 'NO'
   ),
   threshold=list(
     label='national lockdown in IT',

@@ -28,7 +28,7 @@ http = httpx.Client()
 log = logging.getLogger(__name__)
 
 def main():
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
 
     csvf = csv.writer(sys.stdout)
     csvf.writerow(('country', 'date', 'confirmed', 'deaths'))
@@ -43,24 +43,28 @@ def main():
         resp.raise_for_status()
 
         soup = bs4.BeautifulSoup(resp.text, 'lxml')
+
         for div in soup('div', 'barbox'):
             for tr in div('tr'):
                 tds = tr('td')
-                if len(tds) != 4:
+                if len(tds) < 2:
                     continue
 
-                td_date, _td_plot, td_cases, td_deaths = tds
+                td_date, td_plot, *_ = tds
                 s_date = td_date.string.strip()
-                if s_date in ('⋮', 'Date'):
+                if not re.match(r'\d+-\d+-\d+', s_date):
                     continue
+
+                d_deaths, d_recoveries, d_unresolved, _d1, _d2 = td_plot('div')
+                deaths = int(d_deaths['title'])
+                recoveries = int(d_recoveries['title'])
+                unresolved = int(d_unresolved['title'])
 
                 csvf.writerow((
                     country,
                     s_date,
-                    int(td_cases.span.span.string.replace(',', '')),
-                    int(td_deaths.span.string.replace(',', ''))
-                        if td_deaths.span.string
-                        else 0
+                    deaths + recoveries + unresolved,  # confirmed
+                    deaths,
                 ))
 
 main()

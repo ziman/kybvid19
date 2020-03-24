@@ -7,6 +7,8 @@ cd "$(dirname "$0")"
 while true; do
 	date
 	(cd data; git pull)
+	./scrape_wiki.py > wiki.csv
+
 	#R -q -e 'source("covid19.R")'
 	#R -q -e 'source("nl.R")'
 	R -q -e 'source("plot.R")'

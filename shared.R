@@ -10,7 +10,7 @@ theme_kybcae <- theme_minimal() +
     text = element_text(colour='#6DAE42', family='Tahoma', size=10)
   )
 
-load_data <- function() {
+load_who <- function() {
   load <- function(fname) {
     xs_raw <- read_csv(fname)
     colnames(xs_raw)[1:4] <- c('province', 'country', 'lat', 'lon')
@@ -54,20 +54,55 @@ load_data <- function() {
   )
 }
 
-make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries, threshold=NULL, rate_override=NA, bdays=7) {
-  ys <- data$rows %>%
-    filter(
-      type == rtype,
-      country %in% countries,
-      date >= max(date) - bdays*86400
-    ) %>%
-    group_by(country, date) %>%
-    summarise(cases = sum(cases)) %>%
+load_wiki <- function() {
+  xs <- read_csv('wiki.csv') %>%
+    mutate(date=lubridate::ymd(date)) %>%
+    pivot_longer(c(-country, -date), names_to='type', values_to='cases')
+
+  countries <- read_csv('nations1.csv') %>%
+    arrange(year) %>%
+    group_by(country, iso2c) %>%
+    summarise(population = last(population)) %>%
     ungroup() %>%
-    filter(cases > 0) %>%
+    mutate(country = case_when(
+      iso2c == 'IR' ~ 'Iran',
+      iso2c == 'SK' ~ 'Slovakia',
+      iso2c == 'CZ' ~ 'Czechia',
+      T ~ country
+    ), iso2c = case_when(
+      iso2c == 'GB' ~ 'UK',
+      T ~ iso2c
+    ))
+  
+  list(
+    rows = xs,
+    countries = countries
+  )
+}
+
+make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries, threshold=NULL, rate_override=NA, bdays=7) {
+  xs <- data$rows %>%
     inner_join(
       data$countries,
       by='country'
+    ) %>%
+    select(-country) %>%
+    filter(
+      type == rtype,
+      iso2c %in% countries
+    )
+  
+  last_complete_date <- xs %>%
+    group_by(iso2c) %>%
+    summarise(last_date = max(date)) %>%
+    ungroup() %>%
+    pull(last_date) %>%
+    min()
+  
+  ys <- xs %>%
+    filter(
+      date >= last_complete_date - bdays,
+      cases > 0
     ) %>%
     mutate(
       cases_per_1meg = 1e6 * cases / population
@@ -75,19 +110,18 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
     inner_join(
       .,
       filter(., T) %>%
-        group_by(country) %>%
+        group_by(iso2c) %>%
         summarise(first_case = min(date), last_case = max(date), first_case_count = min(cases)) %>%
         ungroup(),
-      by='country'
+      by='iso2c'
     ) %>%
     mutate(
-      days_since_start = as.numeric(date - first_case) / 86400,
-      days_since_end = as.numeric(date - last_case) / 86400,
-      country = paste(iso2c, ' - ', country, sep='')
+      days_since_start = as.numeric(date - first_case),
+      days_since_end = as.numeric(date - last_case)
     )
   
   latest <- ys %>%
-    filter(date == max(date)) %>%
+    filter(date == last_case) %>%
     mutate(rate = (cases / first_case_count) ** (1 / days_since_start))
     
   svk <- latest %>%
@@ -140,7 +174,7 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
         xend=svk$days_since_end + days_ahead,
         y=cases_per_1meg,
         yend=cases_per_1meg,
-        colour=country
+        colour=iso2c
       ),
       linetype='dotted'
     ) +
@@ -149,21 +183,21 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
       aes(
         x=svk$days_since_end + days_ahead,
         y=cases_per_1meg,
-        colour=country
+        colour=iso2c
       ),
       shape=1,
       alpha=0.8
     ) +
     geom_line(
-      aes(y=cases_per_1meg, colour=country),
+      aes(y=cases_per_1meg, colour=iso2c),
       alpha=0.5
     ) +
     geom_point(
-      aes(y=cases_per_1meg, colour=country)
+      aes(y=cases_per_1meg, colour=iso2c)
     ) +
     geom_text_repel(
       data=latest,
-      aes(label=iso2c, y=cases_per_1meg, colour=country),
+      aes(label=iso2c, y=cases_per_1meg, colour=iso2c),
       hjust=0.5,
       vjust=0.5,
       size=2.5,
@@ -179,7 +213,7 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
           paste(signif(days_ahead, 2), ' days ahead of ', focus, sep=''),
           paste(signif(-days_ahead, 2), ' days behind ', focus, sep='')
         ),
-        colour=country
+        colour=iso2c
       ),
       size=3,
       hjust=0,
