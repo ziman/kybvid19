@@ -2,6 +2,14 @@ source('shared.R')
 
 data <- load_wiki()
 
+# fix bad data
+data$rows[
+  (data$rows$country == 'Slovakia')
+  & (data$rows$date >= lubridate::ymd('2020-03-18'))
+  & (data$rows$type == 'deaths'),
+  'cases'
+] <- 1
+
 make_plot(
   data,
   focus='SK',
@@ -9,7 +17,7 @@ make_plot(
   y_label='confirmed cases',
   countries=c(
     'AT', 'IT', 'DE', 'SK', 'ES', 'BE', 'FR',
-    'UK', 'US', 'CZ', 'CH', 'NO'
+    'UK', 'US', 'CZ', 'CH', 'NO', 'NL'
   ),
   threshold=list(
     label='national lockdown in IT',
@@ -25,7 +33,7 @@ make_plot(
   y_label='deaths',
   countries=c(
     'AT', 'IT', 'DE', 'SK', 'ES', 'BE', 'FR',
-    'UK', 'US', 'CZ', 'CH', 'NO'
+    'UK', 'US', 'CZ', 'CH', 'NO', 'NL'
   ),
   threshold=list(
     label='national lockdown in IT',
@@ -42,7 +50,7 @@ make_plot(
   y_label='confirmed cases',
   countries=c(
     'AT', 'IT', 'DE', 'SK', 'ES', 'BE', 'FR',
-    'UK', 'US', 'CZ', 'CH', 'NO'
+    'UK', 'US', 'CZ', 'CH', 'NO', 'NL'
   ),
   threshold=list(
     label='national lockdown in IT',
@@ -58,7 +66,7 @@ make_plot(
   y_label='deaths',
   countries=c(
     'AT', 'IT', 'DE', 'SK', 'ES', 'BE', 'FR',
-    'UK', 'US', 'CZ', 'CH', 'NO'
+    'UK', 'US', 'CZ', 'CH', 'NO', 'NL'
   ),
   threshold=list(
     label='national lockdown in IT',

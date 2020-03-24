@@ -89,7 +89,8 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
     select(-country) %>%
     filter(
       type == rtype,
-      iso2c %in% countries
+      iso2c %in% countries,
+      cases > 0
     )
   
   last_complete_date <- xs %>%
@@ -101,8 +102,7 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
   
   ys <- xs %>%
     filter(
-      date >= last_complete_date - bdays,
-      cases > 0
+      date >= last_complete_date - bdays
     ) %>%
     mutate(
       cases_per_1meg = 1e6 * cases / population
