@@ -10,6 +10,18 @@ import logging
 
 SOURCES = (
     'Italy',
+    'Austria',
+    'Netherlands',
+    'Germany',
+    'Slovakia',
+    'Spain',
+    'Belgium',
+    'France',
+    'United Kingdom',
+    'United States',
+    'Czechia',
+    'Switzerland',
+    'Norway'
 )
 
 http = httpx.Client()
@@ -21,8 +33,13 @@ def main():
     csvf = csv.writer(sys.stdout)
     csvf.writerow(('country', 'date', 'confirmed', 'deaths'))
 
-    for country in SOURCES:
-        resp = http.get(f'https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_{country}')
+    for country in tqdm.tqdm(SOURCES):
+        slug = country.replace(' ', '_') \
+            .replace('Netherlands', 'the_Netherlands') \
+            .replace('United', 'the_United') \
+            .replace('Czechia', 'the_Czech_Republic')
+
+        resp = http.get(f'https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_{slug}')
         resp.raise_for_status()
 
         soup = bs4.BeautifulSoup(resp.text, 'lxml')

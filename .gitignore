@@ -1,5 +1,7 @@
 /.Rhistory
 /.Rdata
+/.mypy_cache/
 *.png
 *.pdf
 *.svg
+wiki.csv
