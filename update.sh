@@ -15,7 +15,7 @@ while true; do
 	cp confirmed-NL.png covid-nl.png
 	cp deaths-NL.png covid-nl-deaths.png
 
-	scp index.html *.png functor.sk:/var/www/kybvid19
+	scp index.html *.png *.svg functor.sk:/var/www/kybvid19
 
 	sleep 3600 || break
 done

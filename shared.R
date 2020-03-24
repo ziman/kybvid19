@@ -198,8 +198,13 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
     guides(colour=F)
   
   ggsave(
+    paste(rtype, '-', focus, '.svg', sep=''),
+    plot=p, dpi=96, width=8, height=6, device='svg'
+  )
+  
+  ggsave(
     paste(rtype, '-', focus, '.png', sep=''),
-    plot=p, dpi=96, width=8, height=6
+    plot=p, dpi=96, width=8, height=6, device='png'
   )
   
   return(p)
