@@ -75,3 +75,35 @@ make_plot(
     y=6.6
   )
 )
+
+make_plot(
+  data,
+  focus='UK',
+  rtype='confirmed',
+  y_label='confirmed cases',
+  countries=c(
+    'AT', 'IT', 'DE', 'SK', 'ES', 'BE', 'FR',
+    'UK', 'US', 'CZ', 'CH', 'NO', 'NL'
+  ),
+  threshold=list(
+    label='national lockdown in IT',
+    x=8,
+    y=133
+  )
+)
+
+make_plot(
+  data,
+  focus='UK',
+  rtype='deaths',
+  y_label='deaths',
+  countries=c(
+    'AT', 'IT', 'DE', 'SK', 'ES', 'BE', 'FR',
+    'UK', 'US', 'CZ', 'CH', 'NO', 'NL'
+  ),
+  threshold=list(
+    label='national lockdown in IT',
+    x=10,
+    y=6.6
+  )
+)
