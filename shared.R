@@ -90,12 +90,12 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
     filter(
       type == rtype,
       iso2c %in% countries,
-      cases > 0
+      cases > 0,
+      date <= (lubridate::now() - lubridate::hours(18))  # start showing today's numbers from 6pm
     ) %>%
-    arrange(iso2c, date) %>%
-    complete(nesting(iso2c, date)) %>%
+    complete(type, iso2c, date) %>%
     fill(cases, population)
-  
+
   last_complete_date <- xs %>%
     group_by(iso2c) %>%
     summarise(last_date = max(date)) %>%
@@ -105,7 +105,8 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
   
   ys <- xs %>%
     filter(
-      date >= last_complete_date - bdays
+      date >= last_complete_date - bdays,
+      date <= last_complete_date
     ) %>%
     mutate(
       cases_per_1meg = 1e6 * cases / population
@@ -120,7 +121,7 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
     ) %>%
     mutate(
       days_since_start = as.numeric(date - first_case),
-      days_since_end = as.numeric(date - last_case)
+      days_since_end = as.numeric(date - last_complete_date)
     )
   
   latest <- ys %>%
