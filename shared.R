@@ -151,7 +151,7 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
     geom_threshold_label <-
       geom_text(
         aes(x,y),
-        data=tibble(x=threshold$x, y=threshold$y),
+        data=tibble(x=last_complete_date + threshold$x, y=threshold$y),
         colour='red',
         size=3,
         label=threshold$label,
@@ -160,11 +160,11 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
       )
   }
   
-  p <- ggplot(ys %>% filter(cases > 0), aes(days_since_end)) +
+  p <- ggplot(ys %>% filter(cases > 0), aes(date)) +
     geom_abline(
       data=tibble(x=1),
       slope=log10(svk$rate),
-      intercept=log10(svk$cases_per_1meg),
+      intercept=log10(svk$cases_per_1meg) - log10(svk$rate) * as.numeric(last_complete_date - lubridate::ymd('1970-01-01')),
       linetype='dashed',
       colour='gray',
       alpha=0.5
@@ -174,8 +174,8 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
     geom_segment(
       data=ahead,
       aes(
-        x=days_since_end,
-        xend=svk$days_since_end + days_ahead,
+        x=date,
+        xend=svk$date + days_ahead,
         y=cases_per_1meg,
         yend=cases_per_1meg,
         colour=iso2c
@@ -185,7 +185,7 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
     geom_point(
       data=ahead,
       aes(
-        x=svk$days_since_end + days_ahead,
+        x=svk$date + days_ahead,
         y=cases_per_1meg,
         colour=iso2c
       ),
@@ -210,7 +210,7 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
     geom_text_repel(
       data=ahead,
       aes(
-        x=pmax(svk$days_since_end + days_ahead, days_since_end),
+        x=pmax(svk$date + days_ahead, date),
         y=cases_per_1meg,
         label=if_else(
           days_ahead > 0,
@@ -221,15 +221,15 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
       ),
       size=3,
       hjust=0,
-      nudge_x=0.3,
+      nudge_x=0.5,
       show.legend=F
     ) +
-    xlim(-bdays, NA) +
     scale_y_log10(
       labels=function(x) signif(x, 1)
     ) +
     ylab(paste(y_label, 'per 1M population')) +
-    xlab('days since latest data update') +
+    xlab(NULL) +
+    xlim(last_complete_date - bdays, NA) +
     ggtitle(paste('Last update: ', max(ys$date))) +
     scale_colour_discrete(name='country') +
     theme_kybcae +
