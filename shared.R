@@ -126,11 +126,17 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
   
   latest <- ys %>%
     filter(date == last_case) %>%
-    mutate(rate = (cases / first_case_count) ** (1 / days_since_start))
+    mutate(
+      rate = (cases / first_case_count) ** (1 / days_since_start),
+      days_to_double = log(2) / log(rate)
+    )
     
   svk <- latest %>%
     filter(iso2c == focus) %>%
-    mutate(rate = replace_na(rate_override, rate))
+    mutate(
+      rate = replace_na(rate_override, rate),
+      days_to_double = log(2) / log(rate)
+    )
 
   ahead <- latest %>%
     filter(iso2c != focus) %>%
@@ -160,7 +166,26 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
       )
   }
   
-  p <- ggplot(ys %>% filter(cases > 0), aes(date)) +
+  mult <- tibble(i = 1:10) %>%
+    mutate(
+      fact = 2**i,
+      cases_per_1meg = svk$cases_per_1meg * fact,
+      date = svk$date + svk$days_to_double * i,
+      label = paste(fact, 'x\nin ', signif(svk$days_to_double*i, 2), ' days', sep='')
+    ) %>%
+    filter(
+      date <= svk$date + max(ahead$days_ahead)
+    )
+  
+  if (is.null(mult)) {
+    mult <- tibble(
+      fact = 1,
+      cases_per_1meg = svk$cases_per_1meg,
+      date=svk$date - 31  # HACK: move off view
+    )
+  }
+  
+  p <- ggplot(NULL) +
     geom_abline(
       data=tibble(x=1),
       slope=log10(svk$rate),
@@ -171,6 +196,30 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
     ) +
     geom_threshold_line +
     geom_threshold_label +
+    geom_segment(
+      data=mult,
+      aes(x=date, y=svk$cases_per_1meg, xend=date, yend=cases_per_1meg),
+      color='gray',
+      linetype='dotted',
+      alpha=0.5
+    ) +
+    geom_segment(
+      data=mult %>% tail(n=1),
+      aes(x=svk$date, y=svk$cases_per_1meg, xend=date, yend=svk$cases_per_1meg),
+      color='gray',
+      linetype='dotted',
+      alpha = 0.5
+    ) +
+    geom_label(
+      data=mult,
+      aes(x=date, y=svk$cases_per_1meg, label=label),
+      color='gray',
+      fill='black',
+      size=3,
+      label.padding=unit(0.1, 'lines'),
+      label.size=NA,
+      alpha=0.5
+    ) +
     geom_segment(
       data=ahead,
       aes(
@@ -193,15 +242,17 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
       alpha=0.8
     ) +
     geom_line(
-      aes(y=cases_per_1meg, colour=iso2c),
+      data=ys,
+      aes(x=date, y=cases_per_1meg, colour=iso2c),
       alpha=0.5
     ) +
     geom_point(
-      aes(y=cases_per_1meg, colour=iso2c)
+      data=ys,
+      aes(x=date, y=cases_per_1meg, colour=iso2c)
     ) +
     geom_text_repel(
       data=latest,
-      aes(label=iso2c, y=cases_per_1meg, colour=iso2c),
+      aes(x=date, label=iso2c, y=cases_per_1meg, colour=iso2c),
       hjust=0.5,
       vjust=0.5,
       size=2.5,
