@@ -90,11 +90,11 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
     filter(
       type == rtype,
       iso2c %in% countries,
-      cases > 0,
       date <= (lubridate::now() - lubridate::hours(18))  # start showing today's numbers from 6pm
     ) %>%
     complete(type, iso2c, date) %>%
-    fill(cases, population)
+    fill(cases, population) %>%
+    filter(cases > 0)  # must be done after complete+fill
 
   last_complete_date <- xs %>%
     group_by(iso2c) %>%
