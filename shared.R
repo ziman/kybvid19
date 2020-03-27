@@ -91,7 +91,10 @@ make_plot <- function(data, focus='SK', rtype = 'confirmed', y_label, countries,
       type == rtype,
       iso2c %in% countries,
       cases > 0
-    )
+    ) %>%
+    arrange(iso2c, date) %>%
+    complete(nesting(iso2c, date)) %>%
+    fill(cases, population)
   
   last_complete_date <- xs %>%
     group_by(iso2c) %>%
