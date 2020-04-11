@@ -21,7 +21,8 @@ SOURCES = (
     'United States',
     'Czechia',
     'Switzerland',
-    'Norway'
+    'Norway',
+    'Sweden'
 )
 
 http = httpx.Client()
@@ -51,6 +52,9 @@ def main():
                     continue
 
                 td_date, td_plot, *_ = tds
+                if td_date.string is None:
+                    continue
+
                 s_date = td_date.string.strip()
                 if not re.match(r'\d+-\d+-\d+', s_date):
                     continue

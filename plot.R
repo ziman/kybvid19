@@ -1,5 +1,10 @@
 source('shared.R')
 
+COUNTRIES <- c(
+  'AT', 'IT', 'DE', 'SK', 'ES', 'BE', 'FR',
+  'UK', 'US', 'CZ', 'CH', 'NO', 'NL', 'SE'
+)
+
 data <- load_wiki()
 
 # fix bad data
@@ -16,10 +21,7 @@ make_plot(
   focus='SK',
   rtype='confirmed',
   y_label='confirmed cases',
-  countries=c(
-    'AT', 'IT', 'DE', 'SK', 'ES', 'BE', 'FR',
-    'UK', 'US', 'CZ', 'CH', 'NO', 'NL'
-  ),
+  countries=COUNTRIES,
   threshold=list(
     label='national lockdown in IT',
     x=15,
@@ -32,10 +34,7 @@ make_plot(
   focus='SK',
   rtype='deaths',
   y_label='deaths',
-  countries=c(
-    'AT', 'IT', 'DE', 'SK', 'ES', 'BE', 'FR',
-    'UK', 'US', 'CZ', 'CH', 'NO', 'NL'
-  ),
+  countries=COUNTRIES,
   threshold=list(
     label='national lockdown in IT',
     x=22,
@@ -49,10 +48,7 @@ make_plot(
   focus='NL',
   rtype='confirmed',
   y_label='confirmed cases',
-  countries=c(
-    'AT', 'IT', 'DE', 'SK', 'ES', 'BE', 'FR',
-    'UK', 'US', 'CZ', 'CH', 'NO', 'NL'
-  ),
+  countries=COUNTRIES,
   threshold=list(
     label='national lockdown in IT',
     x=8,
@@ -65,10 +61,7 @@ make_plot(
   focus='NL',
   rtype='deaths',
   y_label='deaths',
-  countries=c(
-    'AT', 'IT', 'DE', 'SK', 'ES', 'BE', 'FR',
-    'UK', 'US', 'CZ', 'CH', 'NO', 'NL'
-  ),
+  countries=COUNTRIES,
   threshold=list(
     label='national lockdown in IT',
     x=6,
@@ -81,10 +74,7 @@ make_plot(
   focus='UK',
   rtype='confirmed',
   y_label='confirmed cases',
-  countries=c(
-    'AT', 'IT', 'DE', 'SK', 'ES', 'BE', 'FR',
-    'UK', 'US', 'CZ', 'CH', 'NO', 'NL'
-  ),
+  countries=COUNTRIES,
   threshold=list(
     label='national lockdown in IT',
     x=8,
@@ -97,10 +87,7 @@ make_plot(
   focus='UK',
   rtype='deaths',
   y_label='deaths',
-  countries=c(
-    'AT', 'IT', 'DE', 'SK', 'ES', 'BE', 'FR',
-    'UK', 'US', 'CZ', 'CH', 'NO', 'NL'
-  ),
+  countries=COUNTRIES,
   threshold=list(
     label='national lockdown in IT',
     x=10,
