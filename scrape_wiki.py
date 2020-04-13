@@ -59,7 +59,10 @@ def main():
                 if not re.match(r'\d+-\d+-\d+', s_date):
                     continue
 
-                d_deaths, d_recoveries, d_unresolved, _d1, _d2 = td_plot('div')
+                if len(td_plot('div')) < 3:
+                    continue
+
+                d_deaths, d_recoveries, d_unresolved, *_ = td_plot('div')
                 deaths = int(d_deaths['title'])
                 recoveries = int(d_recoveries['title'])
                 unresolved = int(d_unresolved['title'])
