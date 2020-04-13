@@ -7,15 +7,6 @@ COUNTRIES <- c(
 
 data <- load_wiki()
 
-# fix bad data
-data$rows[
-  (data$rows$country == 'Slovakia')
-  & (data$rows$date >= lubridate::ymd('2020-03-18'))
-  & (data$rows$type == 'deaths')
-  & (data$rows$cases == 0),
-  'cases'
-] <- 1
-
 make_plot(
   data,
   focus='SK',
@@ -40,7 +31,7 @@ make_plot(
     x=22,
     y=6.6
   ),
-  rate_override = 1.3
+  rate_override = 1.06
 )
 
 make_plot(
