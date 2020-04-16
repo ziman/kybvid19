@@ -30,8 +30,7 @@ make_plot(
     label='national lockdown in IT',
     x=22,
     y=6.6
-  ),
-  rate_override = 1.06
+  )
 )
 
 make_plot(
