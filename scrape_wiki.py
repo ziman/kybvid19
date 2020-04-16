@@ -59,13 +59,21 @@ def main():
                 if not re.match(r'\d+-\d+-\d+', s_date):
                     continue
 
-                if len(td_plot('div')) < 3:
-                    continue
+                deaths = 0
+                recoveries = 0
+                unresolved = 0
 
-                d_deaths, d_recoveries, d_unresolved, *_ = td_plot('div')
-                deaths = int(d_deaths['title'])
-                recoveries = int(d_recoveries['title'])
-                unresolved = int(d_unresolved['title'])
+                for div in td_plot('div'):
+                    style = div['style']
+                    count = int(div['title'])
+                    if 'background:Black' in style:
+                        deaths = count
+                    elif 'background:SkyBlue' in style:
+                        recoveries = count
+                    elif 'background:Tomato' in style:
+                        unresolved = count
+                    else:
+                        raise Exception(f'unknown colour: {style} for {country}')
 
                 csvf.writerow((
                     country,
