@@ -68,10 +68,18 @@ def main():
                     count = int(div['title'])
                     if 'background:Black' in style:
                         deaths = count
+                    elif 'background:DimGrey' in style:
+                        deaths = count
+                    elif 'background:#A50026' in style:
+                        deaths = count
                     elif 'background:SkyBlue' in style:
                         recoveries = count
                     elif 'background:Tomato' in style:
-                        unresolved = count
+                        unresolved += count
+                    elif 'background:OrangeRed' in style:
+                        unresolved += count
+                    elif 'background:Gold' in style:
+                        unresolved += count
                     else:
                         raise Exception(f'unknown colour: {style} for {country}')
 
