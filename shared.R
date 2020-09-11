@@ -2,6 +2,9 @@ library(tidyverse)
 library(ggrepel)
 require(scales)
 
+# extrafont::font_import()  # only once
+extrafont::loadfonts()  # to get Tahoma
+
 theme_kybcae <- theme_minimal() +
   theme(
     plot.background = element_rect(fill='black'),
