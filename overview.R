@@ -17,10 +17,16 @@ ggplot(
     arrange(country, date) %>%
     mutate(
       c1m = 1e6 * confirmed / population,
-      delta = c1m - lag(c1m),
-      delta_7d = (lead(c1m, n=3) - lag(c1m, n=4)) / 7
-    ) %>% filter(
-      lead(country, n=3) == lag(country, n=4)
+      delta = if_else(
+        country == lag(country),
+        c1m - lag(c1m),
+        NA_real_
+      ),
+      delta_7d = if_else(
+        lead(country, n=3) == lag(country, n=4),
+        (lead(c1m, n=3) - lag(c1m, n=4)) / 7,
+        NA_real_
+      )
     ),
   aes(date)
 ) +
@@ -28,5 +34,5 @@ ggplot(
   geom_point(aes(y = delta), size=.5) +
   facet_wrap('country', ncol = 2, scales='free_y') +
   ylab('new confirmed cases per 1M population per day') +
-  scale_x_date(date_breaks = '1 month') +
+  scale_x_date(date_breaks = '1 month', date_labels = '%b') +
   theme_linedraw()
