@@ -1,4 +1,5 @@
 library(tidyverse)
+source('shared.R')
 
 world <- read_csv('data/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv') %>%
   rename(province=`Province/State`, country=`Country/Region`, lat=`Lat`, lon=`Long`) %>%
@@ -30,11 +31,12 @@ ggplot(
     ),
   aes(date)
 ) +
-  geom_line(aes(y = delta_7d), colour='red', size=2) +
-  geom_point(aes(y = delta), size=.5) +
+  geom_line(aes(y = delta_7d), colour='red', size=1) +
+  geom_point(aes(y = delta), colour='#6dae42', size=.5) +
   facet_wrap('country', ncol = 2, scales='free_y') +
   ylab('new confirmed cases per 1M population per day') +
   scale_x_date(date_breaks = '1 month', date_labels = '%b') +
-  theme_linedraw()
+  theme_kybcae
+  #theme_linedraw()
 
 ggsave('overview.png', dpi=96, width=12, height=8)
