@@ -6,8 +6,8 @@ world <- read_csv('data/csse_covid_19_data/csse_covid_19_time_series/time_series
   mutate(date = lubridate::mdy(date))
 
 population <- tibble(
-  country = c('Netherlands', 'Slovakia', 'Belgium'),
-  population = c(17.4e6, 5e6, 11.4e6)
+  country = c('Netherlands', 'Slovakia', 'Belgium', 'Czechia'),
+  population = c(17.4e6, 5e6, 11.4e6, 10.6e6)
 )
 
 ggplot(
@@ -18,14 +18,15 @@ ggplot(
     mutate(
       c1m = 1e6 * confirmed / population,
       delta = c1m - lag(c1m),
-      delta_7d = (c1m - lag(c1m, n=7)) / 7
-    ) %>%
-    filter(date >= lubridate::ymd('2020-03-01')),
+      delta_7d = (lead(c1m, n=3) - lag(c1m, n=4)) / 7
+    ) %>% filter(
+      lead(country, n=3) == lag(country, n=4)
+    ),
   aes(date)
 ) +
   geom_line(aes(y = delta_7d), colour='red', size=2) +
   geom_point(aes(y = delta), size=.5) +
-  facet_wrap('country', ncol = 2) +
+  facet_wrap('country', ncol = 2, scales='free_y') +
   ylab('new confirmed cases per 1M population per day') +
   scale_x_date(date_breaks = '1 month') +
   theme_linedraw()
