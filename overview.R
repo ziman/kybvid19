@@ -36,3 +36,5 @@ ggplot(
   ylab('new confirmed cases per 1M population per day') +
   scale_x_date(date_breaks = '1 month', date_labels = '%b') +
   theme_linedraw()
+
+ggsave('overview.png', dpi=96, width=12, height=8)
