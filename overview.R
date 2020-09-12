@@ -40,4 +40,36 @@ ggplot(
   theme_kybcae
   #theme_linedraw()
 
-ggsave('overview.png', dpi=96, width=8, height=6)
+ggsave('be-nl-cz-sk.png', dpi=96, width=8, height=6)
+
+ggplot(
+  world %>%
+    filter(is.na(province)) %>%
+    filter(country == 'Netherlands') %>%
+    inner_join(population, by='country') %>%
+    arrange(country, date) %>%
+    mutate(
+      c1m = 1e6 * confirmed / population,
+      delta = if_else(
+        country == lag(country),
+        c1m - lag(c1m),
+        NA_real_
+      ),
+      delta_7d = if_else(
+        lead(country, n=3) == lag(country, n=4),
+        (lead(c1m, n=3) - lag(c1m, n=4)) / 7,
+        NA_real_
+      )
+    ),
+  aes(date)
+) +
+  geom_line(aes(y = delta_7d), colour='red', size=1) +
+  geom_point(aes(y = delta), colour='#6dae42', size=.5) +
+  facet_wrap('country', ncol = 2, scales='free_y') +
+  xlab(NULL) +
+  ylab('new confirmed cases per 1M population per day') +
+  scale_x_date(date_breaks = '1 month', date_labels = '%b') +
+  theme_kybcae
+#theme_linedraw()
+
+ggsave('nl.png', dpi=96, width=5, height=4)
