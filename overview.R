@@ -40,4 +40,4 @@ ggplot(
   theme_kybcae
   #theme_linedraw()
 
-ggsave('overview.png', dpi=96, width=12, height=8)
+ggsave('overview.png', dpi=96, width=8, height=6)
