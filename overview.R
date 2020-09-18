@@ -117,10 +117,10 @@ ggplot(
   world %>%
     filter(is.na(province), quantity=='confirmed') %>%
     filter(country == 'Czechia') %>%
-    inner_join(population, by='country') %>%
     arrange(country, date) %>%
     mutate(
-      c1m = 1e6 * confirmed / population,
+      country = 'Česká republika',
+      c1m = confirmed,
       delta = if_else(
         country == lag(country),
         c1m - lag(c1m),
@@ -140,11 +140,11 @@ ggplot(
   aes(date)
 ) +
   geom_line(aes(y = delta_7d), colour='red', size=1) +
-  geom_line(aes(y = delta_estimate), colour='red', linetype='dotted') +
+  geom_line(aes(y = delta_estimate), colour='red', linetype='dashed') +
   geom_point(aes(y = delta), shape='x') +
   facet_wrap('country', ncol = 2, scales='free_y') +
   xlab(NULL) +
-  ylab('nové potvrdené prípady za deň na 1 mil. obyvateľov') +
+  ylab('počet nových potvrdených prípadov za deň') +
   scale_x_date(date_breaks = '1 month', date_labels = '%b') +
   theme_linedraw()
 
