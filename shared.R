@@ -10,9 +10,11 @@ theme_kybcae <- theme_minimal() +
     plot.background = element_rect(fill='black'),
     panel.grid.major = element_line(colour='#333333'),
     panel.grid.minor = element_line(colour='#222222'),
-    strip.text = element_text(colour='#6DAE42', family='Tahoma', size=10),
+    # strip.text = element_text(colour='#6DAE42', family='Tahoma', size=10),
+    strip.text = element_text(colour='#6DAE42', size=10),
     strip.background = element_rect(fill='#222222', colour='#333333'),
-    text = element_text(colour='#6DAE42', family='Tahoma', size=10)
+    #text = element_text(colour='#6DAE42', family='Tahoma', size=10)
+    text = element_text(colour='#6DAE42', size=10)
   )
 
 load_who <- function() {
