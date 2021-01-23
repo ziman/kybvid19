@@ -364,7 +364,7 @@ population <- tibble(
 ggplot(
   world %>%
     filter(is.na(province), quantity == 'confirmed') %>%
-    filter(date >= lubridate::ymd('2020-12-01')) %>%
+    filter(date >= lubridate::ymd('2020-11-27')) %>%
     inner_join(population, by='country') %>%
     arrange(country, date) %>%
     mutate(
@@ -396,7 +396,7 @@ ggsave('be-nl-cz-sk-lines.png', dpi=96, width=8, height=6)
 ggplot(
   world %>%
     filter(is.na(province), quantity == 'deaths') %>%
-    filter(date >= lubridate::ymd('2020-12-01')) %>%
+    filter(date >= lubridate::ymd('2020-11-27')) %>%
     inner_join(population, by='country') %>%
     arrange(country, date) %>%
     mutate(
@@ -417,7 +417,7 @@ ggplot(
   geom_line(aes(y = delta_7d, colour=country), size=1) +
   #geom_point(aes(y = delta), colour='#6dae42', size=.5) +
   xlab(NULL) +
-  ylab('new confirmed cases per 1M population per day') +
+  ylab('deaths per 1M population per day') +
   scale_x_date(date_breaks = '1 month', date_labels = '%b') +
   ylim(0, NA) +
   theme_kybcae
